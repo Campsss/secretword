@@ -14,7 +14,8 @@ const stages = [
   {id:3,name:"end"},
 ];
 
-const guessesQty = 10
+const guessesQty = 10;
+const scoreToWin = 700;
 
 function App() {
 
@@ -32,7 +33,7 @@ function App() {
 
   const pickWordAndCategory = useCallback (() => {
     const categories = Object.keys(words);
-    const category = categories[Math.floor(Math.random() * Object.keys(categories) . length)];
+    const category = categories[Math.floor(Math.random() * Object.keys(categories).length)];
 
     const word = words[category][Math.floor(Math.random() * words[category].length)];
 
@@ -94,15 +95,27 @@ const clearLetterStates = () => {
     }
   }, [guesses]);
 
+  // Monitora se a palavra foi completada (Vitória da palavra ou do jogo)
   useEffect(() => {
     const uniqueLetters = [...new Set(letters)];
 
-    if(guessedLetters.length === uniqueLetters.length){
-      setScore((actualScore) => actualScore +100);
+    // Condição: Se acertou todas as letras E o jogo está rodando
+    if (guessedLetters.length === uniqueLetters.length && gameStage === stages[1].name) {
+      
+      // Calcula qual será a nova pontuação
+      const addScore = 100;
+      const newScore = score + addScore;
+      
+      setScore(newScore); // Atualiza o state
 
-      StartGame();
+      // LÓGICA NOVA: Verifica se atingiu a pontuação máxima
+      if (newScore >= scoreToWin) {
+        setGameStage(stages[2].name); // Encerra o jogo (Vitória)
+      } else {
+        StartGame(); // Continua para a próxima palavra
+      }
     }
-  }, [guessedLetters, letters, StartGame]);
+  }, [guessedLetters, letters, StartGame, score, gameStage]); // Adicionado score e gameStage nas dependências
 
   const retry = () => {
     setScore(0);
@@ -112,20 +125,20 @@ const clearLetterStates = () => {
 
   return (
     <div className="App">
-      {gameStage ==='start' && <StartScreen startGame={StartGame}/>}
+      {gameStage === 'start' && <StartScreen startGame={StartGame} />}
       {gameStage === 'game' && (
-      <Game 
-        verifyLetter={verifyLetter}
-        pickedWord={pickedWord}
-        pickedCategory={pickedCategory}
-        letters={letters} 
-        guessedLetters={guessedLetters}
-        wrongLetters={wrongLetters}
-        guesses={guesses}
-        score={score}
+        <Game
+          verifyLetter={verifyLetter}
+          pickedWord={pickedWord}
+          pickedCategory={pickedCategory}
+          letters={letters}
+          guessedLetters={guessedLetters}
+          wrongLetters={wrongLetters}
+          guesses={guesses}
+          score={score}
         />
-        )}
-      {gameStage === 'end' && <GameOver retry={retry} score={score}/>}
+      )}
+      {gameStage === 'end' && <GameOver retry={retry} score={score} />}
     </div>
   );
 }
