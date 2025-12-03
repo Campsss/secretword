@@ -82,6 +82,8 @@ function App() {
 
       setGuesses((actualGuesses) => actualGuesses -1);
 
+      
+
   };
 };
 const clearLetterStates = () => {
@@ -107,6 +109,9 @@ const clearLetterStates = () => {
       const newScore = score + addScore;
       
       setScore(newScore); // Atualiza o state
+
+      // Adiciona uma tentativa extra ao acertar a palavra
+      setGuesses((actualGuesses) => actualGuesses + 1);
 
       // LÓGICA NOVA: Verifica se atingiu a pontuação máxima
       if (newScore >= scoreToWin) {
